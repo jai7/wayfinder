@@ -134,4 +134,4 @@ Safari may evict IndexedDB data for origins not visited in 7 days when device st
 
 ## License
 
-MIT
+Apache License 2.0

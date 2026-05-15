@@ -1,11 +1,8 @@
 import { useState } from "react";
 import Icon from "./Icon.jsx";
-import Dots from "./Dots.jsx";
-import { ICON_COLORS } from "../data/challenges.js";
 
 export default function ChallengeSheet({ challenge, onComplete, onClose }) {
   const [reflection, setReflection] = useState("");
-  const [bg, fg] = ICON_COLORS[challenge.icon] ?? ["#F5F5F5", "#666"];
 
   function handleComplete() {
     onComplete(challenge, reflection);
@@ -16,70 +13,71 @@ export default function ChallengeSheet({ challenge, onComplete, onClose }) {
     <div className="overlay" onClick={onClose}>
       <div className="sheet" onClick={e => e.stopPropagation()}>
         <div className="sheet-handle" />
-        <div className="sheet-body">
+        <div className="sheet-body" style={{ paddingBottom: 24 }}>
 
-          {/* Icon + close */}
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20 }}>
-            <div className="bubble" style={{ background: bg, width: 52, height: 52, borderRadius: 16 }}>
-              <Icon name={challenge.icon} size={26} color={fg} />
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+            <div>
+              <div className="lbl">CURRICULUM CITY · {challenge.mode.toUpperCase()}</div>
+              <div style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 900, fontSize: 24, lineHeight: 1, marginTop: 4 }}>
+                {challenge.title.toUpperCase()}
+              </div>
             </div>
             <button className="btn-icon" onClick={onClose} aria-label="Close">
-              <Icon name="x" size={15} color="#3C3C43" />
+              <Icon name="x" size={18} />
             </button>
           </div>
 
-          {/* Badges */}
-          <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
-            <span className="chip blue">Curriculum</span>
-            <span className="chip grey">Permanent</span>
+          {/* Category */}
+          <div className="lbl" style={{ marginBottom: 10 }}>{challenge.category}</div>
+
+          {/* Meta chips */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+            <span className="wf-chip wf-chip-cream">⏱ {challenge.duration}</span>
+            <span className="wf-chip wf-chip-ink">+{challenge.xp} XP</span>
+            <span className="wf-chip wf-chip-cream">
+              {'●'.repeat(challenge.difficulty)}{'○'.repeat(3 - challenge.difficulty)}
+            </span>
           </div>
 
-          {/* Category + title */}
-          <p style={{ fontSize: 11, fontWeight: 600, color: "#8E8E93", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
-            {challenge.category}
-          </p>
-          <h2 style={{ fontSize: 22, fontWeight: 700, color: "#1C1C1E", letterSpacing: "-0.02em", lineHeight: 1.2, marginBottom: 12 }}>
-            {challenge.title}
-          </h2>
-          <p style={{ fontSize: 15, color: "#3C3C43", lineHeight: 1.65, letterSpacing: "-0.01em", marginBottom: 20 }}>
+          {/* Description */}
+          <p style={{ fontSize: 15, color: '#2c4838', lineHeight: 1.65, marginBottom: 16 }}>
             {challenge.description}
           </p>
 
-          {/* Meta chips */}
-          <div className="meta-row">
-            <div className="meta-chip">⏱ {challenge.duration}</div>
-            <div className="meta-chip blue">⚡ +{challenge.xp} XP</div>
-            <div className="meta-chip" style={{ gap: 6 }}>
-              <span style={{ fontSize: 12, color: "#8E8E93" }}>Difficulty</span>
-              <Dots n={challenge.difficulty} />
-            </div>
-          </div>
-
           {/* Tip */}
-          <div className="tip-box">
-            <p className="tip-label">Tip</p>
-            <p className="tip-text">{challenge.tip}</p>
-          </div>
+          {challenge.tip && (
+            <div style={{
+              background: '#fff9e2', border: '2px solid #1a2622',
+              padding: '10px 14px', marginBottom: 16,
+            }}>
+              <div className="lbl" style={{ marginBottom: 4 }}>✦ TIP</div>
+              <p style={{ fontSize: 14, color: '#2c4838', lineHeight: 1.55 }}>{challenge.tip}</p>
+            </div>
+          )}
 
-          {/* Reflection */}
-          <p style={{ fontSize: 14, fontWeight: 600, color: "#1C1C1E", marginBottom: 4, letterSpacing: "-0.01em" }}>
-            {challenge.prompt}
-          </p>
-          <p style={{ fontSize: 12, color: "#8E8E93", marginBottom: 10 }}>
-            Optional — your reflection is saved to Notes in History.
+          {/* Reflection prompt */}
+          <label style={{
+            fontFamily: "'Big Shoulders Display', sans-serif",
+            fontSize: 12, fontWeight: 800, letterSpacing: '0.15em',
+            textTransform: 'uppercase', display: 'block', marginBottom: 6,
+            color: 'rgba(26,38,34,.65)',
+          }}>
+            {challenge.prompt || 'How did it go?'}
+          </label>
+          <p style={{ fontFamily: "'VT323', monospace", fontSize: 13, color: 'rgba(44,72,56,.6)', letterSpacing: '0.04em', marginBottom: 8 }}>
+            Optional — saved to your journal in History.
           </p>
           <textarea
             rows={3}
             placeholder="Write your reflection…"
             value={reflection}
             onChange={e => setReflection(e.target.value)}
-            style={{ marginBottom: 16 }}
           />
 
-          <button className="btn-primary" onClick={handleComplete}>
+          <button className="btn-primary" style={{ marginTop: 16 }} onClick={handleComplete}>
             Mark as Complete · +{challenge.xp} XP
           </button>
-          <div style={{ height: 8 }} />
         </div>
       </div>
     </div>

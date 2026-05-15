@@ -1,109 +1,123 @@
 import { useState } from "react";
 import Icon from "./Icon.jsx";
-import { ICON_COLORS } from "../data/challenges.js";
 
-export default function DrillCard({ drill, doneToday, onComplete }) {
-  const [open, setOpen] = useState(false);
-  const [note, setNote] = useState("");
+const DRILL_SYMBOLS = ['§', '◎', '▤', '✦', '◉', '↺', 'Π'];
 
-  const [bg, fg] = ICON_COLORS[drill.icon] ?? ["#F5F5F5", "#666"];
+export default function DrillCard({ drill, index = 1, doneToday, onComplete }) {
+  const [open, setOpen]   = useState(false);
+  const [notes, setNotes] = useState("");
+  const sym = DRILL_SYMBOLS[(index - 1) % DRILL_SYMBOLS.length];
 
   function handleComplete() {
-    onComplete(drill, note);
+    onComplete(drill, notes);
+    setNotes("");
     setOpen(false);
-    setNote("");
   }
 
   return (
     <>
-      {/* ── Row ── */}
+      {/* Ledger row */}
       <div
-        className="row"
-        style={{ opacity: doneToday ? 0.42 : 1 }}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '28px 38px 1fr 70px 90px',
+          alignItems: 'center',
+          gap: 12,
+          padding: '11px 0',
+          borderBottom: '1px dashed rgba(44,72,56,.7)',
+          opacity: doneToday ? 0.45 : 1,
+          cursor: doneToday ? 'default' : 'pointer',
+        }}
         onClick={() => !doneToday && setOpen(true)}
         role="button"
         tabIndex={doneToday ? -1 : 0}
-        onKeyDown={e => e.key === "Enter" && !doneToday && setOpen(true)}
+        onKeyDown={e => e.key === 'Enter' && !doneToday && setOpen(true)}
+        aria-label={`${drill.title} drill`}
       >
-        <div className="bubble" style={{ background: bg }}>
-          <Icon name={drill.icon} size={20} color={fg} />
+        {/* Index number */}
+        <div style={{ fontFamily: "'VT323', monospace", fontSize: 16, letterSpacing: '0.06em', color: '#2c4838' }}>
+          {String(index).padStart(2, '0')}.
         </div>
 
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
-            <span style={{ fontSize: 14, fontWeight: 600, color: "#1C1C1E", letterSpacing: "-0.01em" }}>
-              {drill.title}
-            </span>
-            {doneToday && (
-              <div style={{ width: 17, height: 17, borderRadius: "50%", background: "#34C759", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <Icon name="check" size={10} color="#fff" strokeWidth={3} />
-              </div>
-            )}
+        {/* Symbol pin */}
+        <div className="pin" style={{ width: 36, height: 36, fontSize: 17 }}>
+          {doneToday ? '✓' : sym}
+        </div>
+
+        {/* Name + description */}
+        <div>
+          <div style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 900, fontSize: 18, lineHeight: 1 }}>
+            {drill.title.toUpperCase()}
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 12, color: "#8E8E93" }}>{drill.duration}</span>
-            <span style={{ color: "#E5E5EA" }}>·</span>
-            <span style={{ fontSize: 12, color: "#34C759", fontWeight: 500 }}>+{drill.xp} XP</span>
+          <div style={{ fontFamily: "'VT323', monospace", fontSize: 13, color: '#2c4838', marginTop: 2, letterSpacing: '0.04em' }}>
+            {drill.description}
           </div>
         </div>
 
-        {!doneToday && <Icon name="chevronR" size={16} color="#C7C7CC" />}
+        {/* Duration */}
+        <div style={{ fontFamily: "'VT323', monospace", fontSize: 14, color: '#2c4838', letterSpacing: '0.06em' }}>
+          {drill.duration}
+        </div>
+
+        {/* XP chip */}
+        <div style={{ textAlign: 'right' }}>
+          <span className={`wf-chip ${doneToday ? 'wf-chip-cream' : 'wf-chip-ink'}`}>
+            +{drill.xp} XP
+          </span>
+        </div>
       </div>
 
-      {/* ── Bottom sheet ── */}
+      {/* Detail bottom sheet */}
       {open && (
-        <div className="overlay" onClick={() => { setOpen(false); setNote(""); }}>
+        <div className="overlay" onClick={() => setOpen(false)}>
           <div className="sheet" onClick={e => e.stopPropagation()}>
             <div className="sheet-handle" />
-            <div className="sheet-body">
+            <div className="sheet-body" style={{ paddingBottom: 24 }}>
+
               {/* Header */}
-              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20 }}>
-                <div className="bubble" style={{ background: bg, width: 52, height: 52, borderRadius: 16 }}>
-                  <Icon name={drill.icon} size={26} color={fg} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                <div>
+                  <div className="lbl">DRILL HEIGHTS · DAILY PRACTICE</div>
+                  <div style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 900, fontSize: 24, lineHeight: 1, marginTop: 4 }}>
+                    {drill.title.toUpperCase()}
+                  </div>
                 </div>
-                <button className="btn-icon" onClick={() => { setOpen(false); setNote(""); }} aria-label="Close">
-                  <Icon name="x" size={15} color="#3C3C43" />
+                <button className="btn-icon" onClick={() => setOpen(false)} aria-label="Close">
+                  <Icon name="x" size={18} />
                 </button>
               </div>
 
-              {/* Badges */}
-              <div style={{ display: "flex", gap: 6, marginBottom: 10 }}>
-                <span className="chip green">Daily Practice</span>
-                <span className="chip grey">Resets tomorrow</span>
+              {/* Meta chips */}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+                <span className="wf-chip wf-chip-cream">⏱ {drill.duration}</span>
+                <span className="wf-chip wf-chip-cream">{drill.category.toUpperCase()}</span>
+                <span className="wf-chip wf-chip-ink">+{drill.xp} XP</span>
               </div>
 
-              <h2 style={{ fontSize: 21, fontWeight: 700, color: "#1C1C1E", letterSpacing: "-0.02em", lineHeight: 1.2, marginBottom: 12 }}>
-                {drill.title}
-              </h2>
-              <p style={{ fontSize: 15, color: "#3C3C43", lineHeight: 1.65, letterSpacing: "-0.01em", marginBottom: 20 }}>
+              {/* Description */}
+              <p style={{ fontSize: 15, color: '#2c4838', lineHeight: 1.6, marginBottom: 16 }}>
                 {drill.description}
               </p>
 
-              {/* Meta */}
-              <div className="meta-row">
-                <div className="meta-chip">⏱ {drill.duration}</div>
-                <div className="meta-chip green">⚡ +{drill.xp} XP</div>
-              </div>
-
               {/* Reflection */}
-              <p style={{ fontSize: 14, fontWeight: 600, color: "#1C1C1E", marginBottom: 4, letterSpacing: "-0.01em" }}>
-                Quick reflection
-              </p>
-              <p style={{ fontSize: 12, color: "#8E8E93", marginBottom: 10 }}>
-                Optional — short notes build long-term spatial memory.
-              </p>
+              <label style={{
+                fontFamily: "'Big Shoulders Display', sans-serif",
+                fontSize: 12, fontWeight: 800, letterSpacing: '0.15em',
+                textTransform: 'uppercase', display: 'block', marginBottom: 8,
+                color: 'rgba(26,38,34,.65)',
+              }}>
+                Quick Reflection (Optional)
+              </label>
               <textarea
-                rows={2}
-                placeholder="How did it go?"
-                value={note}
-                onChange={e => setNote(e.target.value)}
-                style={{ marginBottom: 16 }}
+                rows={3}
+                placeholder="What did you notice? Any surprises?"
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
               />
 
-              <button className="btn-primary green" onClick={handleComplete}>
+              <button className="btn-primary" style={{ marginTop: 16 }} onClick={handleComplete}>
                 Complete Drill · +{drill.xp} XP
               </button>
-              <div style={{ height: 8 }} />
             </div>
           </div>
         </div>

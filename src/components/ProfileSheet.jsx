@@ -26,77 +26,111 @@ export default function ProfileSheet({ profile, stats, onClose, onUpdate, onRese
     <div className="overlay" onClick={onClose}>
       <div className="sheet" onClick={e => e.stopPropagation()}>
         <div className="sheet-handle" />
-        <div className="sheet-body">
+        <div className="sheet-body" style={{ paddingBottom: 24 }}>
 
           {/* Header */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-            <h2 style={{ fontSize: 17, fontWeight: 600, color: "#1C1C1E", letterSpacing: "-0.01em" }}>Profile</h2>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div>
+              <div className="lbl">OBSERVER RECORD</div>
+              <div style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 900, fontSize: 24, lineHeight: 1, marginTop: 2 }}>
+                PROFILE
+              </div>
+            </div>
             <button className="btn-icon" onClick={onClose} aria-label="Close">
-              <Icon name="x" size={15} color="#3C3C43" />
+              <Icon name="x" size={18} />
             </button>
           </div>
+          <hr style={{ borderTop: '2px solid #1a2622', borderBottom: 'none', marginBottom: 16 }} />
 
           {!editing ? (
             <>
               {/* Avatar row */}
-              <div style={{ display: "flex", alignItems: "center", gap: 16, padding: 16, background: "#F9F9F9", borderRadius: 16, marginBottom: 20 }}>
-                <div style={{ width: 60, height: 60, borderRadius: 20, background: avBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <span style={{ fontSize: 22, fontWeight: 700, color: avFg }}>{initials(profile.name)}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px', background: '#fff9e2', border: '2px solid #1a2622', marginBottom: 16 }}>
+                <div style={{ width: 52, height: 52, background: avBg, border: '2px solid #1a2622', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <span style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: 18, fontWeight: 900, color: avFg }}>
+                    {initials(profile.name)}
+                  </span>
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 18, fontWeight: 700, color: "#1C1C1E", letterSpacing: "-0.02em", marginBottom: 2 }}>{profile.name}</div>
-                  <div style={{ fontSize: 13, color: "#8E8E93" }}>
-                    Since {new Date(profile.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                  <div style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 900, fontSize: 20, lineHeight: 1, letterSpacing: '0.02em' }}>
+                    {profile.name.toUpperCase()}
+                  </div>
+                  <div style={{ fontFamily: "'VT323', monospace", fontSize: 13, color: '#2c4838', letterSpacing: '0.08em', marginTop: 2 }}>
+                    SINCE {new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }).toUpperCase()}
                   </div>
                 </div>
                 <button
                   onClick={() => setEditing(true)}
-                  style={{ background: "#E8F4FF", border: "none", borderRadius: 10, padding: "7px 13px", color: "#007AFF", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}
+                  style={{
+                    border: '2px solid #1a2622', background: '#fdf6df', padding: '6px 12px',
+                    display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer',
+                    fontFamily: "'Big Shoulders Display', sans-serif",
+                    fontSize: 12, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase',
+                  }}
                 >
-                  <Icon name="edit" size={13} color="#007AFF" /> Edit
+                  <Icon name="edit" size={12} /> EDIT
                 </button>
               </div>
 
               {/* Stats grid */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0, marginBottom: 16 }}>
                 {[
-                  ["Total XP",     `${stats.xp} XP`,       "#007AFF", "#E8F4FF"],
-                  ["Challenges",   `${stats.done} done`,    "#34C759", "#E8F9EE"],
-                  ["Day Streak",   `${stats.streak} days`,  "#FF9500", "#FFF3E0"],
-                  ["Daily Drills", `${stats.drills} total`, "#AF52DE", "#F3E5F5"],
-                ].map(([label, value, color, bg]) => (
-                  <div key={label} style={{ background: bg, borderRadius: 14, padding: "14px 16px" }}>
-                    <div style={{ fontSize: 11, fontWeight: 600, color, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>{label}</div>
-                    <div style={{ fontSize: 20, fontWeight: 700, color: "#1C1C1E", letterSpacing: "-0.02em" }}>{value}</div>
+                  { label: 'TOTAL XP',     value: `${stats.xp}`,         bar: '#9fd6d8' },
+                  { label: 'CHALLENGES',   value: `${stats.done} DONE`,   bar: '#f0a6b5' },
+                  { label: 'DAY STREAK',   value: `${stats.streak} DAYS`, bar: '#f4dc7c' },
+                  { label: 'DAILY DRILLS', value: `${stats.drills} TOTAL`,bar: '#9cd6a5' },
+                ].map(({ label, value, bar }, i) => (
+                  <div
+                    key={label}
+                    style={{
+                      padding: '12px 14px',
+                      border: '1px solid #1a2622',
+                      borderTop: i < 2 ? '2px solid #1a2622' : '1px solid #1a2622',
+                      borderLeft: i % 2 === 0 ? '2px solid #1a2622' : '1px solid #1a2622',
+                      borderRight: '2px solid #1a2622',
+                      borderBottom: i >= 2 ? '2px solid #1a2622' : '1px solid #1a2622',
+                      background: '#fff9e2',
+                    }}
+                  >
+                    <div style={{ width: 20, height: 4, background: bar, marginBottom: 6 }} />
+                    <div className="lbl" style={{ fontSize: 10, marginBottom: 4 }}>{label}</div>
+                    <div style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 900, fontSize: 22, lineHeight: 1 }}>
+                      {value}
+                    </div>
                   </div>
                 ))}
               </div>
 
               {/* Storage note */}
-              <div style={{ background: "#F9F9F9", borderRadius: 12, padding: "12px 14px", marginBottom: 20, display: "flex", gap: 10, alignItems: "flex-start" }}>
-                <Icon name="book" size={16} color="#8E8E93" strokeWidth={2} />
-                <p style={{ fontSize: 13, color: "#6C6C70", lineHeight: 1.6 }}>
-                  Your journal and activity history are stored privately in your browser's IndexedDB — they never leave your device.
-                </p>
+              <div style={{ fontFamily: "'VT323', monospace", fontSize: 13, color: 'rgba(44,72,56,.6)', letterSpacing: '0.06em', lineHeight: 1.55, marginBottom: 16, padding: '8px 0', borderTop: '1px dashed rgba(44,72,56,.4)', borderBottom: '1px dashed rgba(44,72,56,.4)' }}>
+                ★ ALL JOURNAL &amp; ACTIVITY DATA STORED PRIVATELY IN YOUR BROWSER'S INDEXEDDB — NEVER LEAVES YOUR DEVICE.
               </div>
 
               {/* Reset */}
               {!confirmReset ? (
                 <button
                   onClick={() => setConfirm(true)}
-                  style={{ width: "100%", padding: 13, border: "1.5px solid #FFE5E5", borderRadius: 14, background: "#FFF5F5", color: "#FF3B30", fontSize: 15, fontWeight: 600, cursor: "pointer", letterSpacing: "-0.01em" }}
+                  style={{
+                    width: '100%', padding: '12px',
+                    border: '2px solid #e63a2e', background: 'rgba(230,58,46,.08)',
+                    color: '#e63a2e', cursor: 'pointer',
+                    fontFamily: "'Big Shoulders Display', sans-serif",
+                    fontSize: 14, fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase',
+                  }}
                 >
                   Reset All Progress
                 </button>
               ) : (
-                <div style={{ background: "#FFF5F5", border: "1.5px solid #FFE5E5", borderRadius: 14, padding: 16 }}>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: "#FF3B30", marginBottom: 6 }}>Are you sure?</p>
-                  <p style={{ fontSize: 13, color: "#6C6C70", marginBottom: 14 }}>
-                    This deletes all XP, streaks, completed challenges, drills, and journal entries. Cannot be undone.
+                <div style={{ border: '2px solid #e63a2e', background: 'rgba(230,58,46,.06)', padding: 14 }}>
+                  <div style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 900, fontSize: 16, color: '#e63a2e', marginBottom: 6 }}>
+                    ARE YOU SURE?
+                  </div>
+                  <p style={{ fontFamily: "'VT323', monospace", fontSize: 14, color: '#2c4838', letterSpacing: '0.06em', lineHeight: 1.5, marginBottom: 12 }}>
+                    THIS DELETES ALL XP, STREAKS, COMPLETED CHALLENGES, DRILLS, AND JOURNAL ENTRIES. CANNOT BE UNDONE.
                   </p>
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button onClick={onReset} style={{ flex: 1, padding: 11, border: "none", borderRadius: 10, background: "#FF3B30", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>Yes, Reset</button>
-                    <button onClick={() => setConfirm(false)} className="btn-ghost" style={{ flex: 1, padding: 11, borderRadius: 10, fontSize: 14 }}>Cancel</button>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button onClick={onReset} className="btn-primary" style={{ flex: 2, background: '#e63a2e', borderColor: '#e63a2e' }}>YES, RESET</button>
+                    <button onClick={() => setConfirm(false)} className="btn-ghost" style={{ flex: 1 }}>CANCEL</button>
                   </div>
                 </div>
               )}
@@ -104,44 +138,45 @@ export default function ProfileSheet({ profile, stats, onClose, onUpdate, onRese
           ) : (
             <>
               {/* Edit form */}
-              <p style={{ fontSize: 14, fontWeight: 600, color: "#1C1C1E", marginBottom: 6 }}>Name</p>
+              <div className="lbl" style={{ marginBottom: 6 }}>OBSERVER NAME</div>
               <input
                 type="text"
                 value={name}
                 maxLength={40}
                 onChange={e => setName(e.target.value)}
-                style={{ marginBottom: 20 }}
+                style={{ marginBottom: 16 }}
               />
 
-              <p style={{ fontSize: 14, fontWeight: 600, color: "#1C1C1E", marginBottom: 16 }}>Avatar Colour</p>
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 28 }}>
+              <div className="lbl" style={{ marginBottom: 10 }}>MARKER COLOUR</div>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 24 }}>
                 {AVATAR_COLORS.map(([cb, cf], i) => (
                   <button
                     key={i}
                     style={{
-                      width: 52, height: 52, borderRadius: 16,
-                      background: cb, border: `2.5px solid ${avatarIdx === i ? "#007AFF" : "transparent"}`,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      cursor: "pointer",
-                      transform: avatarIdx === i ? "scale(1.08)" : "scale(1)",
-                      transition: "transform 0.14s",
+                      width: 48, height: 48,
+                      background: cb,
+                      border: `2px solid ${avatarIdx === i ? '#e63a2e' : '#1a2622'}`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer',
+                      transform: avatarIdx === i ? 'scale(1.1)' : 'scale(1)',
+                      transition: 'transform 0.14s',
                     }}
                     onClick={() => setIdx(i)}
                     aria-label={`Colour ${i + 1}`}
                   >
-                    <span style={{ fontSize: 14, fontWeight: 700, color: cf }}>{initials(name) || "?"}</span>
+                    <span style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: 13, fontWeight: 900, color: cf }}>
+                      {initials(name) || '?'}
+                    </span>
                   </button>
                 ))}
               </div>
 
-              <div style={{ display: "flex", gap: 10 }}>
-                <button className="btn-primary" style={{ flex: 2 }} onClick={save}>Save Changes</button>
-                <button className="btn-ghost" style={{ flex: 1 }} onClick={cancelEdit}>Cancel</button>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button className="btn-primary" style={{ flex: 2 }} onClick={save}>SAVE CHANGES</button>
+                <button className="btn-ghost" style={{ flex: 1 }} onClick={cancelEdit}>CANCEL</button>
               </div>
             </>
           )}
-
-          <div style={{ height: 8 }} />
         </div>
       </div>
     </div>

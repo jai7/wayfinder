@@ -12,7 +12,6 @@ import { AVATAR_COLORS, SKILL_MAP } from "./data/levels.js";
 import { getLevel, getNextLevel, initials } from "./utils/levels.js";
 import { getGreeting, todayKey } from "./utils/dates.js";
 
-// Detects desktop breakpoint reactively
 function useIsDesktop() {
   const [isDesktop, setIsDesktop] = useState(() =>
     typeof window !== "undefined" ? window.innerWidth >= 768 : false
@@ -27,9 +26,9 @@ function useIsDesktop() {
 }
 
 const TABS = [
-  { id: "challenges", label: "Challenges", icon: "zap"      },
-  { id: "skills",     label: "Skills",     icon: "barChart"  },
-  { id: "history",    label: "History",    icon: "activity"  },
+  { id: "challenges", label: "Drills",   icon: "zap"      },
+  { id: "skills",     label: "Skills",   icon: "barChart"  },
+  { id: "history",    label: "History",  icon: "activity"  },
 ];
 
 export default function App() {
@@ -43,7 +42,6 @@ export default function App() {
   const [banner, setBanner]           = useState(null);
   const bannerTimer                   = useRef(null);
 
-  // Streak integrity + daily drill reset on mount
   useEffect(() => {
     gameState.checkStreak();
     if (gameState.drillsToday.date !== todayKey()) {
@@ -57,7 +55,6 @@ export default function App() {
     bannerTimer.current = setTimeout(() => setBanner(null), 2400);
   }
 
-  // Game actions passed down to screens
   const enrichedGameState = {
     ...gameState,
     completeChallenge(challenge) {
@@ -91,138 +88,136 @@ export default function App() {
   const level    = getLevel(gameState.xp);
   const nextLvl  = getNextLevel(gameState.xp);
   const xpIn     = gameState.xp - level.min;
-  const xpNeeded = nextLvl.min - level.min;
+  const xpNeeded = nextLvl ? nextLvl.min - level.min : 1;
   const prog     = Math.min(100, Math.round((xpIn / xpNeeded) * 100));
   const [avBg, avFg] = AVATAR_COLORS[profile.avatarIdx ?? 0];
-
-  // ── Shared header content (used in both mobile header and desktop sidebar)
-  const HeaderContent = (
-    <>
-      {/* Level bar */}
-      <div style={{ background: "#F9F9F9", borderRadius: 14, padding: "14px 16px", marginBottom: isDesktop ? 0 : 16 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontSize: 20 }}>{level.emoji}</span>
-            <div>
-              <p style={{ fontSize: 14, fontWeight: 600, color: "#1C1C1E", letterSpacing: "-0.01em" }}>{level.name}</p>
-              <p style={{ fontSize: 12, color: "#8E8E93", marginTop: 1 }}>→ {nextLvl.name} {nextLvl.emoji}</p>
-            </div>
-          </div>
-          <span style={{ fontSize: 12, color: "#8E8E93" }}>{xpIn} / {xpNeeded} XP</span>
-        </div>
-        <div className="progress-track">
-          <div className="progress-fill" style={{ width: `${prog}%` }} />
-        </div>
-      </div>
-    </>
-  );
 
   // ── DESKTOP LAYOUT ──────────────────────────────────────────────────────────
   if (isDesktop) {
     return (
-      <div style={{ display: "flex", minHeight: "100vh", background: "#F2F2F7" }}>
+      <div className="desktop-shell pop-paper">
 
-        {/* XP banner */}
-        {banner !== null && <div className="xp-banner" role="status">+{banner} XP earned 🎯</div>}
+        {banner !== null && (
+          <div className="xp-banner" role="status">+{banner} XP EARNED ✦</div>
+        )}
 
         {/* ── Sidebar ── */}
-        <aside style={{
-          width: 280, flexShrink: 0, position: "fixed", top: 0, left: 0, bottom: 0,
-          background: "#fff", borderRight: "1px solid #F2F2F7",
-          display: "flex", flexDirection: "column", padding: "40px 0 0", zIndex: 80, overflowY: "auto",
-        }}>
-          <div style={{ padding: "0 20px", flex: 1 }}>
+        <aside className="sidebar">
+          <div className="sidebar-inner">
 
-            {/* App name */}
-            <div style={{ marginBottom: 24 }}>
-              <p style={{ fontSize: 11, fontWeight: 600, color: "#8E8E93", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 6 }}>
-                🧭 Wayfinder
-              </p>
-              <p style={{ fontSize: 13, color: "#8E8E93", letterSpacing: "-0.01em", marginBottom: 2 }}>{getGreeting()},</p>
-              <h1 style={{ fontSize: 22, fontWeight: 700, color: "#1C1C1E", letterSpacing: "-0.03em", lineHeight: 1.2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                {profile.name} 👋
-              </h1>
-            </div>
-
-            {/* Streak + XP chips */}
-            <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
-              <div style={{ background: "#FFF3E0", borderRadius: 10, padding: "7px 12px", display: "flex", alignItems: "center", gap: 5 }}>
-                <Icon name="flame" size={14} color="#FF9500" />
-                <span style={{ fontSize: 13, fontWeight: 600, color: "#FF9500" }}>{gameState.streak}</span>
-                <span style={{ fontSize: 12, color: "#FF9500" }}>streak</span>
+            {/* Wordmark */}
+            <div style={{ marginBottom: 28 }}>
+              <div style={{ fontFamily: "'VT323', monospace", fontSize: 12, letterSpacing: '0.15em', color: 'rgba(253,246,223,.45)', marginBottom: 4 }}>
+                VOL. I · 1986 EDITION
               </div>
-              <div style={{ background: "#E8F4FF", borderRadius: 10, padding: "7px 12px", display: "flex", alignItems: "center", gap: 5 }}>
-                <Icon name="zap" size={14} color="#007AFF" />
-                <span style={{ fontSize: 13, fontWeight: 600, color: "#007AFF" }}>{gameState.xp}</span>
-                <span style={{ fontSize: 12, color: "#007AFF" }}>XP</span>
+              <div style={{
+                fontFamily: "'Bungee', sans-serif",
+                fontSize: 28,
+                color: '#fdf6df',
+                textShadow: '2px 2px 0 rgba(80,180,210,.5)',
+                lineHeight: 1,
+              }}>
+                WAYFINDER
+              </div>
+              <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 11, color: 'rgba(253,246,223,.45)', marginTop: 4, lineHeight: 1.4 }}>
+                pocket atlas of personal orientation
               </div>
             </div>
 
-            {/* Level bar */}
-            <div style={{ background: "#F9F9F9", borderRadius: 14, padding: "14px 16px", marginBottom: 28 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 18 }}>{level.emoji}</span>
-                  <div>
-                    <p style={{ fontSize: 13, fontWeight: 600, color: "#1C1C1E", letterSpacing: "-0.01em" }}>{level.name}</p>
-                    <p style={{ fontSize: 11, color: "#8E8E93", marginTop: 1 }}>→ {nextLvl.name}</p>
-                  </div>
+            {/* Profile row */}
+            <button
+              onClick={() => setShowProfile(true)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                background: 'rgba(253,246,223,.08)', border: '1px solid rgba(253,246,223,.2)',
+                cursor: 'pointer', padding: '10px 12px', marginBottom: 20,
+              }}
+            >
+              <div style={{
+                width: 34, height: 34, background: avBg,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <span style={{ fontSize: 12, fontWeight: 700, color: avFg, fontFamily: "'Big Shoulders Display', sans-serif" }}>
+                  {initials(profile.name)}
+                </span>
+              </div>
+              <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#fdf6df', fontFamily: "'Big Shoulders Display', sans-serif", letterSpacing: '0.05em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {profile.name.toUpperCase()}
                 </div>
-                <span style={{ fontSize: 11, color: "#8E8E93" }}>{xpIn}/{xpNeeded}</span>
+                <div style={{ fontFamily: "'VT323', monospace", fontSize: 13, color: 'rgba(253,246,223,.5)', letterSpacing: '0.08em' }}>
+                  {level.name.toUpperCase()} · {gameState.xp} XP
+                </div>
               </div>
-              <div className="progress-track">
-                <div className="progress-fill" style={{ width: `${prog}%` }} />
+              <Icon name="chevronR" size={14} color="rgba(253,246,223,.4)" />
+            </button>
+
+            {/* XP bar */}
+            <div style={{ marginBottom: 24 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                <span style={{ fontFamily: "'VT323', monospace", fontSize: 13, color: 'rgba(253,246,223,.55)', letterSpacing: '0.1em' }}>
+                  {level.name.toUpperCase()}
+                </span>
+                {nextLvl && (
+                  <span style={{ fontFamily: "'VT323', monospace", fontSize: 13, color: 'rgba(253,246,223,.35)', letterSpacing: '0.08em' }}>
+                    → {nextLvl.name.toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <div style={{ height: 8, background: 'rgba(253,246,223,.15)', border: '1px solid rgba(253,246,223,.25)' }}>
+                <div style={{ height: '100%', width: `${prog}%`, background: '#e63a2e', transition: 'width 0.6s' }} />
+              </div>
+              <div style={{ fontFamily: "'VT323', monospace", fontSize: 12, color: 'rgba(253,246,223,.4)', letterSpacing: '0.08em', marginTop: 4 }}>
+                {xpIn} / {xpNeeded} XP
               </div>
             </div>
 
-            {/* Nav links */}
-            <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            {/* Streak */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8, marginBottom: 28,
+              background: 'rgba(230,58,46,.15)', border: '1px solid rgba(230,58,46,.3)',
+              padding: '8px 12px',
+            }}>
+              <span style={{ fontSize: 16 }}>🔥</span>
+              <span style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: 18, fontWeight: 900, color: '#e63a2e' }}>
+                {gameState.streak}
+              </span>
+              <span style={{ fontFamily: "'VT323', monospace", fontSize: 14, color: 'rgba(253,246,223,.5)', letterSpacing: '0.1em' }}>
+                DAY STREAK
+              </span>
+            </div>
+
+            {/* Nav */}
+            <nav className="sidebar-nav">
               {TABS.map(({ id, label, icon }) => (
-                <button key={id} onClick={() => setTab(id)} style={{
-                  display: "flex", alignItems: "center", gap: 12, padding: "11px 14px",
-                  borderRadius: 12, border: "none", cursor: "pointer", textAlign: "left", width: "100%",
-                  fontSize: 15, fontWeight: tab === id ? 600 : 500, letterSpacing: "-0.01em",
-                  background: tab === id ? "#E8F4FF" : "none",
-                  color: tab === id ? "#007AFF" : "#3C3C43",
-                  transition: "background 0.12s, color 0.12s",
-                }}>
-                  <Icon name={icon} size={18} color={tab === id ? "#007AFF" : "#8E8E93"} strokeWidth={tab === id ? 2.2 : 1.75} />
+                <button
+                  key={id}
+                  className={`sidebar-nav-btn${tab === id ? " active" : ""}`}
+                  onClick={() => setTab(id)}
+                >
+                  <Icon name={icon} size={16} color={tab === id ? "#e63a2e" : "rgba(253,246,223,.4)"} strokeWidth={tab === id ? 2.2 : 1.75} />
                   {label}
                 </button>
               ))}
             </nav>
           </div>
 
-          {/* Profile button at bottom of sidebar */}
-          <div style={{ padding: "20px", borderTop: "1px solid #F2F2F7" }}>
-            <button onClick={() => setShowProfile(true)} style={{
-              display: "flex", alignItems: "center", gap: 12, width: "100%",
-              background: "none", border: "none", cursor: "pointer", padding: "8px 6px", borderRadius: 12,
-              transition: "background 0.12s",
-            }}
-              onMouseEnter={e => e.currentTarget.style.background = "#F2F2F7"}
-              onMouseLeave={e => e.currentTarget.style.background = "none"}
-            >
-              <div style={{ width: 36, height: 36, borderRadius: 11, background: avBg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: avFg }}>{initials(profile.name)}</span>
-              </div>
-              <div style={{ flex: 1, minWidth: 0, textAlign: "left" }}>
-                <p style={{ fontSize: 14, fontWeight: 600, color: "#1C1C1E", letterSpacing: "-0.01em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{profile.name}</p>
-                <p style={{ fontSize: 12, color: "#8E8E93" }}>View profile</p>
-              </div>
-              <Icon name="chevronR" size={14} color="#C7C7CC" />
-            </button>
+          {/* Footer */}
+          <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(253,246,223,.15)' }}>
+            <div style={{ fontFamily: "'VT323', monospace", fontSize: 12, color: 'rgba(253,246,223,.3)', letterSpacing: '0.1em', lineHeight: 1.6 }}>
+              ★ TRUE NORTH BY THE SHADOW AT NOON<br />
+              R.S. WAYFINDER & CO. · CHICAGO · 1986
+            </div>
           </div>
         </aside>
 
         {/* ── Main content ── */}
-        <main style={{ marginLeft: 280, flex: 1, minHeight: "100vh" }}>
-          {tab === "challenges" && <ChallengesScreen gameState={enrichedGameState} db={db} />}
+        <main className="main-content">
+          {tab === "challenges" && <ChallengesScreen gameState={enrichedGameState} db={db} profile={profile} />}
           {tab === "skills"     && <SkillsScreen     gameState={enrichedGameState} />}
           {tab === "history"    && <HistoryScreen     db={db} />}
         </main>
 
-        {/* Profile sheet */}
         {showProfile && (
           <ProfileSheet
             profile={profile}
@@ -238,59 +233,62 @@ export default function App() {
 
   // ── MOBILE LAYOUT ───────────────────────────────────────────────────────────
   return (
-    <div>
-      {banner !== null && <div className="xp-banner" role="status">+{banner} XP earned 🎯</div>}
+    <div className="pop-paper" style={{ minHeight: '100vh' }}>
+      {banner !== null && (
+        <div className="xp-banner" role="status">+{banner} XP EARNED ✦</div>
+      )}
 
       <div className="app-wrap">
         {/* Sticky mobile header */}
         <header className="header">
           <div className="header-inner">
-            {/* Greeting + chips + avatar */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+              {/* Left: wordmark + greeting */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 13, color: "#8E8E93", letterSpacing: "-0.01em", marginBottom: 2 }}>{getGreeting()},</p>
-                <h1 style={{ fontSize: 26, fontWeight: 700, color: "#1C1C1E", letterSpacing: "-0.03em", lineHeight: 1.1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {profile.name} 👋
-                </h1>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0, marginLeft: 12 }}>
-                <div style={{ background: "#FFF3E0", borderRadius: 10, padding: "7px 10px", display: "flex", alignItems: "center", gap: 4 }}>
-                  <Icon name="flame" size={14} color="#FF9500" />
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#FF9500" }}>{gameState.streak}</span>
+                <div style={{ fontFamily: "'VT323', monospace", fontSize: 11, letterSpacing: '0.15em', color: 'rgba(26,38,34,.5)' }}>
+                  {getGreeting().toUpperCase()},
                 </div>
-                <div style={{ background: "#E8F4FF", borderRadius: 10, padding: "7px 10px", display: "flex", alignItems: "center", gap: 4 }}>
-                  <Icon name="zap" size={14} color="#007AFF" />
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#007AFF" }}>{gameState.xp}</span>
+                <div style={{
+                  fontFamily: "'Big Shoulders Display', sans-serif",
+                  fontSize: 22, fontWeight: 900, lineHeight: 1,
+                  color: '#1a2622', letterSpacing: '-0.01em',
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}>
+                  {profile.name.toUpperCase()}
                 </div>
-                <button onClick={() => setShowProfile(true)} aria-label="Open profile"
-                  style={{ width: 40, height: 40, borderRadius: 13, background: avBg, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: avFg, letterSpacing: "-0.01em" }}>{initials(profile.name)}</span>
-                </button>
               </div>
-            </div>
 
-            {/* Level bar */}
-            <div style={{ background: "#F9F9F9", borderRadius: 14, padding: "14px 16px", marginBottom: 16 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 20 }}>{level.emoji}</span>
-                  <div>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: "#1C1C1E", letterSpacing: "-0.01em" }}>{level.name}</p>
-                    <p style={{ fontSize: 12, color: "#8E8E93", marginTop: 1 }}>→ {nextLvl.name} {nextLvl.emoji}</p>
-                  </div>
+              {/* Right: streak + XP + avatar */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, marginLeft: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(230,58,46,.12)', border: '1.5px solid rgba(230,58,46,.35)', padding: '4px 8px' }}>
+                  <span style={{ fontSize: 12 }}>🔥</span>
+                  <span style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: 14, fontWeight: 900, color: '#e63a2e' }}>{gameState.streak}</span>
                 </div>
-                <span style={{ fontSize: 12, color: "#8E8E93" }}>{xpIn} / {xpNeeded} XP</span>
-              </div>
-              <div className="progress-track">
-                <div className="progress-fill" style={{ width: `${prog}%` }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(26,38,34,.07)', border: '1.5px solid rgba(26,38,34,.2)', padding: '4px 8px' }}>
+                  <span style={{ fontFamily: "'VT323', monospace", fontSize: 14, color: '#1a2622', letterSpacing: '0.08em' }}>{gameState.xp} XP</span>
+                </div>
+                <button
+                  onClick={() => setShowProfile(true)}
+                  style={{ width: 36, height: 36, background: avBg, border: '2px solid #1a2622', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                  aria-label="Open profile"
+                >
+                  <span style={{ fontSize: 12, fontWeight: 700, color: avFg, fontFamily: "'Big Shoulders Display', sans-serif" }}>
+                    {initials(profile.name)}
+                  </span>
+                </button>
               </div>
             </div>
 
             {/* Tab strip */}
             <nav className="header-tabs" aria-label="Main navigation">
               {TABS.map(({ id, label, icon }) => (
-                <button key={id} className={`header-tab${tab === id ? " active" : ""}`} onClick={() => setTab(id)} aria-current={tab === id ? "page" : undefined}>
-                  <Icon name={icon} size={14} color={tab === id ? "#007AFF" : "#AEAEB2"} />
+                <button
+                  key={id}
+                  className={`header-tab${tab === id ? " active" : ""}`}
+                  onClick={() => setTab(id)}
+                  aria-current={tab === id ? "page" : undefined}
+                >
+                  <Icon name={icon} size={13} color={tab === id ? "#e63a2e" : "rgba(44,72,56,.5)"} />
                   {label}
                 </button>
               ))}
@@ -299,7 +297,7 @@ export default function App() {
         </header>
 
         {/* Screens */}
-        {tab === "challenges" && <ChallengesScreen gameState={enrichedGameState} db={db} />}
+        {tab === "challenges" && <ChallengesScreen gameState={enrichedGameState} db={db} profile={profile} />}
         {tab === "skills"     && <SkillsScreen     gameState={enrichedGameState} />}
         {tab === "history"    && <HistoryScreen     db={db} />}
       </div>
@@ -307,9 +305,15 @@ export default function App() {
       {/* Bottom tab bar */}
       <nav className="tab-bar" aria-label="Tab bar">
         {TABS.map(({ id, label, icon }) => (
-          <button key={id} className="tab-btn" onClick={() => setTab(id)} aria-label={label} aria-current={tab === id ? "page" : undefined}>
-            <Icon name={icon} size={22} color={tab === id ? "#007AFF" : "#8E8E93"} strokeWidth={tab === id ? 2.2 : 1.75} />
-            <span className="tab-label" style={{ color: tab === id ? "#007AFF" : "#8E8E93" }}>{label}</span>
+          <button
+            key={id}
+            className={`tab-btn${tab === id ? " active" : ""}`}
+            onClick={() => setTab(id)}
+            aria-label={label}
+            aria-current={tab === id ? "page" : undefined}
+          >
+            <Icon name={icon} size={20} color={tab === id ? "#e63a2e" : "rgba(44,72,56,.6)"} strokeWidth={tab === id ? 2.2 : 1.75} />
+            <span className="tab-label">{label}</span>
           </button>
         ))}
       </nav>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Icon from "../components/Icon.jsx";
-import { groupByDate } from "../utils/dates.js";
+import { groupByDate, formatTimestamp } from "../utils/dates.js";
 
 export default function HistoryScreen({ db }) {
   const [subTab, setSubTab] = useState("feed");
@@ -94,7 +94,7 @@ export default function HistoryScreen({ db }) {
                           {(entry.title || '').toUpperCase()}
                         </div>
                         <div style={{ fontFamily: "'VT323', monospace", fontSize: 13, color: '#2c4838', letterSpacing: '0.06em', marginTop: 2 }}>
-                          {isDrill ? 'DAILY DRILL' : 'CURRICULUM'} · {entry.createdTime}
+                          {isDrill ? 'DAILY DRILL' : 'CURRICULUM'} · {formatTimestamp(entry.createdAt)}
                         </div>
                       </div>
                       <div style={{
@@ -154,7 +154,7 @@ export default function HistoryScreen({ db }) {
                         {entry.ch || 'OBSERVATION'}
                       </span>
                       <span style={{ fontFamily: "'VT323', monospace", fontSize: 13, color: 'rgba(44,72,56,.6)', letterSpacing: '0.06em', marginLeft: 8 }}>
-                        · {entry.createdDate}
+                        · {formatTimestamp(entry.createdAt)}
                       </span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

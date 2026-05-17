@@ -17,12 +17,9 @@ db.version(1).stores({
  * @param {object} entry - { profileId, type, ch, category, icon, text, xp }
  */
 export async function addJournalEntry(entry) {
-  const ts = Date.now();
   return db.journal.add({
     ...entry,
-    createdAt: ts,
-    date: new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-    time: new Date(ts).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+    createdAt: Date.now(),
   });
 }
 
@@ -50,12 +47,9 @@ export async function deleteJournalEntry(id) {
  * @param {object} event - { profileId, type, title, category, icon, xp }
  */
 export async function logActivity(event) {
-  const ts = Date.now();
   return db.activity.add({
     ...event,
-    createdAt: ts,
-    date: new Date(ts).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-    time: new Date(ts).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+    createdAt: Date.now(),
   });
 }
 
